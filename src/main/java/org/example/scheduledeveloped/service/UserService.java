@@ -2,6 +2,7 @@ package org.example.scheduledeveloped.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.scheduledeveloped.dto.SignUpResponseDto;
+import org.example.scheduledeveloped.dto.UpdateUserRequestDto;
 import org.example.scheduledeveloped.dto.UserResponseDto;
 import org.example.scheduledeveloped.entity.User;
 import org.example.scheduledeveloped.repository.UserRepository;
@@ -42,5 +43,25 @@ public class UserService {
                 .stream()
                 .map(UserResponseDto::toDto)
                 .toList();
+    }
+
+    public UserResponseDto updateUser(UpdateUserRequestDto requestDto, String newUserName,String newPassword) {
+        User foundedUser = userRepository.findUserByUserNameAndPasswordOrElseThrow(requestDto.getUserName(), requestDto.getPassword());
+
+        foundedUser.updateUserNameAndPassword(newUserName,newPassword);
+
+        return UserResponseDto.toDto(foundedUser);
+    }
+
+
+    public void deleteUser(Long id) {
+        User byId = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User가 존재하지 않습니다."));
+        userRepository.delete(byId);
+    }
+
+    public UserResponseDto login(String email, String password){
+        User loginUser = userRepository.findUserByUserEmailAndPasswordOrElseThrow(email,password);
+
+        return UserResponseDto.toDto(loginUser);
     }
 }

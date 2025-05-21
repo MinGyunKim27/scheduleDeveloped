@@ -28,18 +28,44 @@ public class TodoService {
 
         User user = userRepository.findMemberByUserNameOrElseThrow(userName);
 
-        Todo todo = new Todo(title,contents);
-        todo.setUser(user);
+        Todo todo = new Todo(title,contents,user);
 
         todoRepository.save(todo);
 
-        return new TodoResponseDto(todo.getId(),todo.getTitle(),todo.getContents());
+        return new TodoResponseDto(todo.getId(),todo.getTitle(),todo.getContents(),userName);
     }
 
-    public List<TodoResponseDto> findAll(){
-        return todoRepository.findAll()
-                .stream()
-                .map(TodoResponseDto::toDto)
-                .toList();
+
+    public List<TodoResponseDto> findTodosByOptionalConditions(String title, String contents) {
+        List<Todo> todos;
+
+        if (title != null && !title.isBlank() && contents != null && !contents.isBlank()) {
+            todos = todoRepository.findByContentsContainingAndTitle(contents, title);
+        } else if (title != null && !title.isBlank()) {
+            todos = todoRepository.findByTitle(title);
+        } else if (contents != null && !contents.isBlank()) {
+            todos = todoRepository.findByContentsContaining(contents);
+        } else {
+            todos = todoRepository.findAll();
+        }
+
+        return todos.stream().map(TodoResponseDto::toDto).toList();
+    }
+
+    public TodoResponseDto findTodoById(Long id) {
+
+        Todo byId = todoRepository.findTodoByIdOrElseThrow(id);
+        return TodoResponseDto.toDto(byId);
+    }
+
+    public TodoResponseDto updateTodo(Long id, String title, String contents) {
+        Todo byId = todoRepository.findTodoByIdOrElseThrow(id);
+        byId.updateTodo(title,contents);
+        return TodoResponseDto.toDto(byId);
+    }
+
+    public void deleteTodo(Long id) {
+        Todo byId = todoRepository.findTodoByIdOrElseThrow(id);
+        todoRepository.delete(byId);
     }
 }

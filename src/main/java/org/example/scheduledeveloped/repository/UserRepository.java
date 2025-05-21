@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User,Long> {
     Optional<User> findUserByUserName(String userName);
 
+    Optional<User> findUserByEmailAndPassword(String email, String password);
+
 
     default User findMemberByUserNameOrElseThrow(String userName){
         return findUserByUserName(userName).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -20,5 +22,15 @@ public interface UserRepository extends JpaRepository<User,Long> {
     default User findByIdOrElseThrow(Long id){
         return findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
                 "Does not exist userName = " + id));
+    };
+
+    Optional<User> findUserByUserNameAndPassword(String userName,String password);
+
+    default User findUserByUserNameAndPasswordOrElseThrow(String userName, String password){
+        return findUserByUserNameAndPassword(userName,password).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Does not exist userName and password"));
+    };
+
+    default User findUserByUserEmailAndPasswordOrElseThrow(String email, String password){
+        return findUserByEmailAndPassword(email, password).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Does not exist Email and password"));
     };
 }

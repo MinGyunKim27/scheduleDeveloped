@@ -7,18 +7,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CreateTodoRequestDto {
+public class UpdateTodoRequestDto {
 
     private String title;
 
     private String contents;
 
-    private String userName;
 
-
-    public CreateTodoRequestDto(String title, String contents, String userName) {
+    public UpdateTodoRequestDto(String title, String contents) {
         this.title = title;
         this.contents = contents;
-        this.userName = userName;
     }
 }

@@ -25,12 +25,18 @@ public class Todo extends BaseEntity{
     private User user;
 
 
-    public Todo(String title, String contents) {
+    public Todo(String title, String contents, User user) {
         this.title = title;
         this.contents = contents;
+        this.user = user;
     }
 
     public Todo() {
 
+    }
+
+    public void updateTodo(String title, String contents){
+        this.title = title;
+        this.contents = contents;
     }
 }

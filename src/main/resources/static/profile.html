@@ -1,0 +1,85 @@
+<!-- src/main/resources/static/profile.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>내 프로필</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .profile-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .info {
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .info span {
+            font-weight: bold;
+            color: #333;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="profile-container">
+    <h1>👤 내 프로필</h1>
+    <div class="info">이름: <span id="userName">로딩 중...</span></div>
+    <div class="info">이메일: <span id="email">로딩 중...</span></div>
+
+    <button onclick="location.href='/profileUpdate.html'">내 정보 수정</button>
+</div>
+
+<script>
+    // 세션 기반 사용자 조회
+    fetch('/users/me')
+        .then(res => {
+            if (!res.ok) throw new Error("로그인 필요");
+            return res.json();
+        })
+        .then(user => {
+            document.getElementById('userName').textContent = user.userName;
+            document.getElementById('email').textContent = user.email;
+        })
+        .catch(err => {
+            alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+            window.location.href = '/login.html';
+        });
+</script>
+</body>
+</html>

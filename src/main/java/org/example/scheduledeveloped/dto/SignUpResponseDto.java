@@ -12,6 +12,7 @@ public class SignUpResponseDto {
 
     private final String userName;
 
+
     public SignUpResponseDto(Long id, String username, String email) {
         this.id = id;
         this.email = email;

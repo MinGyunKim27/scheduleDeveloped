@@ -1,0 +1,185 @@
+<!-- src/main/resources/static/todo.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>투두 상세</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .todo-detail {
+            background-color: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .field {
+            margin-bottom: 12px;
+        }
+
+        .field strong {
+            display: inline-block;
+            width: 80px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 4px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        button {
+            margin-top: 12px;
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .update-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .update-btn:hover {
+            background-color: #45a049;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .back-btn {
+            background-color: #ccc;
+            color: black;
+        }
+
+        .back-btn:hover {
+            background-color: #bbb;
+        }
+    </style>
+</head>
+<body>
+<div class="todo-detail">
+    <h1>📝 투두 상세</h1>
+
+    <form id="update-form">
+        <div class="field">
+            <strong>ID:</strong> <span id="todo-id"></span>
+        </div>
+        <div class="field">
+            <label><strong>제목:</strong>
+                <input type="text" id="todo-title" required>
+            </label>
+        </div>
+        <div class="field">
+            <label><strong>내용:</strong>
+                <textarea id="todo-contents" rows="4" required></textarea>
+            </label>
+        </div>
+        <div class="field">
+            <strong>작성자:</strong> <span id="todo-user"></span>
+        </div>
+
+        <button type="submit" class="update-btn">수정하기</button>
+        <button type="button" class="delete-btn" onclick="deleteTodo()">삭제하기</button>
+        <button type="button" class="back-btn" onclick="goBack()">← 목록으로</button>
+    </form>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    if (!id) {
+        alert('유효하지 않은 접근입니다.');
+        window.location.href = '/todos.html';
+    }
+
+    // 상세 조회
+    fetch(`/api/todos/${id}`)
+        .then(res => {
+            if (!res.ok) throw new Error('조회 실패');
+            return res.json();
+        })
+        .then(todo => {
+            document.getElementById('todo-id').textContent = todo.id;
+            document.getElementById('todo-title').value = todo.title;
+            document.getElementById('todo-contents').value = todo.contents;
+            document.getElementById('todo-user').textContent = todo.userName || '알 수 없음';
+        })
+        .catch(err => {
+            console.error(err);
+            alert('투두를 불러오지 못했습니다.');
+            window.location.href = '/todos.html';
+        });
+
+    // 수정 요청
+    document.getElementById('update-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const title = document.getElementById('todo-title').value;
+        const contents = document.getElementById('todo-contents').value;
+
+        fetch(`/api/todos/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, contents })
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert('수정 완료!');
+                    location.reload();
+                } else {
+                    alert('수정 실패');
+                }
+            });
+    });
+
+    // 삭제 요청
+    function deleteTodo() {
+        if (!confirm('정말로 삭제하시겠습니까?')) return;
+
+        fetch(`/api/todos/${id}`, {
+            method: 'DELETE'
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert('삭제 완료!');
+                    window.location.href = '/todos.html';
+                } else {
+                    alert('삭제 실패');
+                }
+            });
+    }
+
+    function goBack() {
+        window.location.href = '/todos.html';
+    }
+</script>
+</body>
+</html>

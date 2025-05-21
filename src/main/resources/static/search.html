@@ -1,0 +1,136 @@
+<!-- src/main/resources/static/search.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>투두 검색</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .todo-item {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: #fafafa;
+            cursor: pointer;
+        }
+
+        .todo-item:hover {
+            background-color: #e6f7e6;
+        }
+
+        .back-button {
+            margin-top: 24px;
+            background-color: #aaa;
+        }
+
+        .back-button:hover {
+            background-color: #888;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔍 투두 검색</h1>
+
+    <!-- 검색 폼 -->
+    <form id="search-form">
+        <input type="text" id="title" placeholder="제목 검색">
+        <input type="text" id="contents" placeholder="내용 검색">
+        <button type="submit">검색</button>
+    </form>
+
+    <!-- 검색 결과 -->
+    <div id="search-results" style="margin-top: 24px;"></div>
+
+    <!-- 뒤로가기 -->
+    <button class="back-button" onclick="location.href='/todos.html'">← 투두 목록으로 돌아가기</button>
+</div>
+
+<script>
+    function fetchResults(title = '', contents = '') {
+        let url = '/api/todos';
+        const params = [];
+        if (title) params.push(`title=${encodeURIComponent(title)}`);
+        if (contents) params.push(`contents=${encodeURIComponent(contents)}`);
+        if (params.length) url += '?' + params.join('&');
+
+        fetch(url)
+            .then(res => res.json())
+            .then(todos => {
+                const resultArea = document.getElementById('search-results');
+                resultArea.innerHTML = '';
+
+                if (todos.length === 0) {
+                    resultArea.innerHTML = '<p>🔍 검색 결과가 없습니다.</p>';
+                    return;
+                }
+
+                todos.forEach(todo => {
+                    const div = document.createElement('div');
+                    div.className = 'todo-item';
+                    div.textContent = `[${todo.id}] ${todo.title} - ${todo.contents}`;
+                    div.onclick = () => {
+                        window.location.href = `/todo.html?id=${todo.id}`;
+                    };
+                    resultArea.appendChild(div);
+                });
+            });
+    }
+
+    // 폼 제출 시 검색 실행
+    document.getElementById('search-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const title = document.getElementById('title').value.trim();
+        const contents = document.getElementById('contents').value.trim();
+        fetchResults(title, contents);
+    });
+
+    // 페이지 진입 시 전체 투두 보여주기 (초기 상태)
+    fetchResults();
+</script>
+</body>
+</html>

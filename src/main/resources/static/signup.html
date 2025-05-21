@@ -1,0 +1,96 @@
+<!-- src/main/resources/static/signup.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .signup-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 300px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="signup-container">
+    <h1>회원가입</h1>
+    <form id="signup-form">
+        <input type="text" id="email" placeholder="이메일" required><br>
+        <input type="text" id="userName" placeholder="이름" required><br>
+        <input type="password" id="password" placeholder="비밀번호" required><br>
+        <button type="submit">가입하기</button>
+    </form>
+</div>
+
+<script>
+    const form = document.getElementById('signup-form');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const userName = document.getElementById('userName').value;
+
+        fetch('/auth/signup', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                email: email,
+                password: password,
+                userName: userName
+            })
+        }).then(res => {
+            if (res.ok) {
+                alert('가입 성공! 로그인 페이지로 이동합니다.');
+                window.location.href = '/login.html';
+            } else {
+                alert('가입 실패');
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!-- src/main/resources/static/profileUpdate.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>내 정보 수정</title>
+</head>
+<body>
+<h1>내 정보 수정</h1>
+<form id="update-form">
+    <label>새 이름: <input type="text" id="newUserName" required></label><br>
+    <label>새 비밀번호: <input type="password" id="newPassword" required></label><br>
+    <button type="submit">수정하기</button>
+</form>
+
+<script>
+    document.getElementById('update-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const newUserName = document.getElementById('newUserName').value;
+        const newPassword = document.getElementById('newPassword').value;
+
+        // 세션에서 현재 사용자 정보 불러오기
+        fetch('/users/me')
+            .then(res => {
+                if (!res.ok) throw new Error('로그인 필요');
+                return res.json();
+            })
+            .then(user => {
+                const updateDto = {
+                    id: user.id,
+                    email: user.email,
+                    userName: user.userName,
+                    password: 'dummy' // 서버에서 이전 비번은 검증 없이 쓰는 구조라면 더미값
+                };
+
+                return fetch(`/users?newUserName=${encodeURIComponent(newUserName)}&newPassword=${encodeURIComponent(newPassword)}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateDto)
+                });
+            })
+            .then(res => {
+                if (res.ok) {
+                    alert('정보 수정 완료!');
+                    window.location.href = '/profile.html';
+                } else {
+                    alert('수정 실패');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('오류 발생. 다시 시도하세요.');
+            });
+    });
+</script>
+</body>
+</html>

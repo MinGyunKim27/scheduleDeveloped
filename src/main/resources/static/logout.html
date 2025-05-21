@@ -1,0 +1,22 @@
+<!-- logout.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>로그아웃</title>
+</head>
+<body>
+<h1>로그아웃</h1>
+<button onclick="logout()">로그아웃 하기</button>
+
+<script>
+    function logout() {
+        fetch('/auth/logout')
+            .then(() => {
+                alert('로그아웃 되었습니다.');
+                window.location.href = '/login.html';
+            });
+    }
+</script>
+</body>
+</html>
