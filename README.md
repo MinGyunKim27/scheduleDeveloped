@@ -16,9 +16,8 @@
 - Spring Boot 3.x
 - Spring Web / Validation / JPA
 - MySQL
-- H2 (로컬 테스트 용도)
 - Gradle
-- HTML, JavaScript (Vanilla)
+- HTML
 
 ## 📌 주요 기능
 
@@ -99,9 +98,16 @@ java -jar build/libs/scheduledeveloped-0.0.1-SNAPSHOT.jar
 | 댓글 수정          | PATCH  | /api/todos/{todoId}/comments/{id} | contents         | 수정된 댓글               | 200 OK   |
 | 댓글 삭제          | DELETE | /api/todos/{todoId}/comments/{id} | 없음              | 없음                      | 200 OK   |
 
+
+## 📚 API 문서
+
+API 테스트 및 상세 명세는 아래 Postman 링크에서 확인하실 수 있습니다:  
+🔗 [API 명세 바로가기]([https://documenter.getpostman.com/view/xxxxxx](https://documenter.getpostman.com/view/27028554/2sB2qZEhrs))
+
 ---
 
 본 프로젝트는 학습 및 기능 구현 목적으로 설계되었으며,
 실제 운영 환경에서는 JWT 기반 인증, CSRF 보호 등 추가적인 보안 요소가 필요합니다.
 
-![Todo.png](/Todo.png)
+
+
