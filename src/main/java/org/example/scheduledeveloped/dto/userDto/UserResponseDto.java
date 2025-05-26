@@ -3,6 +3,10 @@ package org.example.scheduledeveloped.dto.userDto;
 import lombok.Getter;
 import org.example.scheduledeveloped.entity.User;
 
+
+/**
+ *
+ */
 @Getter
 public class UserResponseDto {
     private final Long id;

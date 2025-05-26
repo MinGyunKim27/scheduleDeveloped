@@ -3,6 +3,10 @@ package org.example.scheduledeveloped.dto;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+
+/**
+ *
+ */
 public class ErrorResponseDto{
     private final int status;
     private final String message;

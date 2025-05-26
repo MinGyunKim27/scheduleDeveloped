@@ -3,6 +3,10 @@ package org.example.scheduledeveloped.dto.todoDto;
 import lombok.Getter;
 import org.example.scheduledeveloped.entity.Todo;
 
+
+/**
+ *
+ */
 @Getter
 public class TodoResponseDto {
     private final Long id;
@@ -17,6 +21,11 @@ public class TodoResponseDto {
         this.userName = userName;
     }
 
+    /**
+     *
+     * @param todo
+     * @return
+     */
     public static TodoResponseDto toDto(Todo todo) {
         String userName = todo.getUser() != null ? todo.getUser().getUserName() : "알 수 없음";
         return new TodoResponseDto(

@@ -16,6 +16,12 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+
+    /**
+     *
+     * @param ex
+     * @return
+     */
     // @RequestBody 유효성 검사 실패
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDto> handleValidationException(MethodArgumentNotValidException ex) {
@@ -32,6 +38,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     *
+     * @param ex
+     * @return
+     */
     // @RequestParam, @PathVariable 유효성 검사 실패
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponseDto> handleConstraintViolation(ConstraintViolationException ex) {
@@ -49,6 +60,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     *
+     * @param ex
+     * @return
+     */
     // 비밀번호 불일치 예외
     @ExceptionHandler(PasswordMismatchException.class)
     public ResponseEntity<ErrorResponseDto> handlePasswordMismatch(PasswordMismatchException ex) {
@@ -60,6 +76,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
+    /**
+     *
+     * @param ex
+     * @return
+     */
     // 사용자 없음 예외 → 404 처리로 수정
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handleUserNotFound(UserNotFoundException ex) {
@@ -71,6 +92,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+    /**
+     *
+     * @param ex
+     * @return
+     */
     //권한 없음
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponseDto> handleAccessDenied(AccessDeniedException ex) {
@@ -82,6 +108,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
+    /**
+     *
+     * @param ex
+     * @return
+     */
     // ResponseStatusException 처리 (권한, 논리 등)
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponseDto> handleResponseStatus(ResponseStatusException ex) {
@@ -93,6 +124,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(responseDto, ex.getStatusCode());
     }
 
+    /**
+     *
+     * @param ex
+     * @return
+     */
     // 기타 모든 예외 (서버 내부 오류)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleGeneric(Exception ex) {

@@ -4,6 +4,9 @@ package org.example.scheduledeveloped.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+/**
+ *
+ */
 @Entity
 @Table(name = "userDev")
 @Getter

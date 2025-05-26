@@ -15,12 +15,21 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+/**
+ *
+ */
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> findUserById(
             @PathVariable Long id){
@@ -30,9 +39,10 @@ public class UserController {
     }
 
 
-    /*
-    고민 한 부분
-    여기서 로직을 나눌 것인가, 엔티티에서 나눌 것인가
+    /**
+     *
+     * @param name
+     * @return
      */
     @GetMapping
     public ResponseEntity<?> findUsers(
@@ -46,6 +56,14 @@ public class UserController {
         }
     }
 
+
+    /**
+     *
+     * @param id
+     * @param dto
+     * @param session
+     * @return
+     */
     @PatchMapping("/{id}")
     public ResponseEntity<SessionUserResponseDto> updateUsers(
             @PathVariable Long id,
@@ -60,6 +78,14 @@ public class UserController {
         return new ResponseEntity<>(user,HttpStatus.OK);
     }
 
+
+    /**
+     *
+     * @param id
+     * @param dto
+     * @param session
+     * @return
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(
             @PathVariable Long id,
@@ -72,6 +98,12 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
+    /**
+     *
+     * @param session
+     * @return
+     */
     @GetMapping("/me")
     public ResponseEntity<UserResponseDto> getCurrentUser(HttpSession session) {
         UserResponseDto user = (UserResponseDto) session.getAttribute(Const.LOGIN_USER);

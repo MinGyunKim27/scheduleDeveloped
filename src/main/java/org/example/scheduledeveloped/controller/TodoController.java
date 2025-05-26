@@ -15,12 +15,23 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+/**
+ *
+ */
 @RestController
 @RequestMapping("/api/todos")
 @RequiredArgsConstructor
 public class TodoController {
     private final TodoService todoService;
 
+
+    /**
+     *
+     * @param requestDto
+     * @param session
+     * @return
+     */
     @PostMapping
     public ResponseEntity<TodoResponseDto> postTodo(
             @Validated @RequestBody CreateTodoRequestDto requestDto,
@@ -35,6 +46,13 @@ public class TodoController {
         return new ResponseEntity<>(responseDto,HttpStatus.OK);
     }
 
+
+    /**
+     *
+     * @param title
+     * @param contents
+     * @return
+     */
     @GetMapping
     public ResponseEntity<?> findTodos(
             @Validated @RequestParam(required = false) String title,
@@ -44,6 +62,12 @@ public class TodoController {
         return ResponseEntity.ok(todoResponseDto);
     }
 
+
+    /**
+     *
+     * @param id
+     * @return
+     */
     @GetMapping("/{id}")
     public ResponseEntity<TodoResponseDto> findTodoById(
             @Validated @PathVariable Long id
@@ -53,6 +77,14 @@ public class TodoController {
         return new ResponseEntity<>(todoResponseDto,HttpStatus.OK);
     }
 
+
+    /**
+     *
+     * @param id
+     * @param requestDto
+     * @param session
+     * @return
+     */
     @PatchMapping("/{id}")
     public ResponseEntity<TodoResponseDto> updateTodo(
             @Validated @PathVariable Long id,
@@ -64,6 +96,13 @@ public class TodoController {
         return new ResponseEntity<>(todoResponseDto,HttpStatus.OK);
     }
 
+
+    /**
+     *
+     * @param id
+     * @param session
+     * @return
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTodo(
             @Validated @PathVariable Long id,

@@ -19,6 +19,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
+/**
+ *
+ */
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -26,6 +30,14 @@ public class CommentService {
     private final TodoRepository todoRepository;
     private final UserRepository userRepository;
 
+
+    /**
+     *
+     * @param todoId
+     * @param dto
+     * @param sessionUserResponseDto
+     * @return
+     */
     @Transactional
     public CommentResponseDto createComment(Long todoId, CommentRequestDto dto, SessionUserResponseDto sessionUserResponseDto) {
 
@@ -43,6 +55,12 @@ public class CommentService {
         return CommentResponseDto.toDto(comment);
     }
 
+
+    /**
+     *
+     * @param todoId
+     * @return
+     */
     public List<CommentResponseDto> findCommentByTodoId(Long todoId) {
 
         return commentRepository.findAllByTodo_Id(todoId)
@@ -51,6 +69,14 @@ public class CommentService {
                 .toList();
     }
 
+
+    /**
+     *
+     * @param id
+     * @param requestDto
+     * @param sessionUserResponseDto
+     * @return
+     */
     public CommentResponseDto updateComments(
             Long id,
             CommentRequestDto requestDto,
@@ -65,12 +91,25 @@ public class CommentService {
         return CommentResponseDto.toDto(comment);
     }
 
+
+    /**
+     *
+     * @param comment
+     * @param userId
+     */
     private void validateCommentOwner(Comment comment, Long userId) {
         if (!comment.getUser().getId().equals(userId)) {
             throw new AccessDeniedException("해당 할 일을 수정할 권한이 없습니다.");
         }
     }
 
+
+    /**
+     *
+     * @param id
+     * @param sessionUserResponseDto
+     * @return
+     */
     public Long deleteComment(Long id, SessionUserResponseDto sessionUserResponseDto) {
 
         Comment comment = commentRepository.findById(id).orElseThrow(

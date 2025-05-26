@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+/**
+ *
+ */
 @RestController
 @RequestMapping("/api/todos/{todoId}/comments")
 @RequiredArgsConstructor
@@ -20,6 +24,14 @@ public class CommentController {
 
     private final CommentService commentService;
 
+
+    /**
+     *
+     * @param dto
+     * @param todoId
+     * @param session
+     * @return
+     */
     @PostMapping
     public ResponseEntity<CommentResponseDto> createComment(
             @RequestBody CommentRequestDto dto,
@@ -32,6 +44,12 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+
+    /**
+     *
+     * @param todoId
+     * @return
+     */
     @GetMapping
     public ResponseEntity<List<CommentResponseDto>> findComments(
             @PathVariable Long todoId
@@ -41,6 +59,14 @@ public class CommentController {
         return new ResponseEntity<>(dtos,HttpStatus.OK);
     }
 
+
+    /**
+     *
+     * @param id
+     * @param requestDto
+     * @param session
+     * @return
+     */
     @PatchMapping("/{id}")
     public ResponseEntity<CommentResponseDto> updateComment(
             @PathVariable Long id,
@@ -53,6 +79,13 @@ public class CommentController {
         return ResponseEntity.ok(responseDto);
     }
 
+
+    /**
+     *
+     * @param id
+     * @param session
+     * @return
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long id,

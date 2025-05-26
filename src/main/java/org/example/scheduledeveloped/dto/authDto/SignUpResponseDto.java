@@ -3,6 +3,10 @@ package org.example.scheduledeveloped.dto.authDto;
 
 import lombok.Getter;
 
+
+/**
+ *
+ */
 @Getter
 public class SignUpResponseDto {
 

@@ -3,6 +3,9 @@ package org.example.scheduledeveloped.dto.commentDto;
 import lombok.Getter;
 import org.example.scheduledeveloped.entity.Comment;
 
+/**
+ *
+ */
 @Getter
 public class CommentResponseDto {
     private final Long id;

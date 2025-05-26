@@ -3,6 +3,10 @@ package org.example.scheduledeveloped.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+
+/**
+ *
+ */
 @Entity
 @Getter
 @Table(name = "comment")

@@ -16,6 +16,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
+/**
+ *
+ */
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -23,6 +26,12 @@ public class AuthController {
     private final UserService userService;
     private final AuthService authService;
 
+
+    /**
+     *
+     * @param requestDto
+     * @return
+     */
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponseDto> signUp(@Validated @RequestBody SignUpRequestDto requestDto ){
         SignUpResponseDto signUpResponseDto = authService.signUp(requestDto.getUserName(), requestDto.getEmail(), requestDto.getPassword());
@@ -30,6 +39,12 @@ public class AuthController {
         return new ResponseEntity<>(signUpResponseDto, HttpStatus.OK);
     }
 
+    /**
+     *
+     * @param requestDto
+     * @param servletRequest
+     * @return
+     */
     @PostMapping("/login")
     public String login(
             @Validated @RequestBody LoginRequestDto requestDto,
@@ -53,6 +68,11 @@ public class AuthController {
 
     }
 
+    /**
+     *
+     * @param request
+     * @return
+     */
     @GetMapping("/logout")
     public String logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);

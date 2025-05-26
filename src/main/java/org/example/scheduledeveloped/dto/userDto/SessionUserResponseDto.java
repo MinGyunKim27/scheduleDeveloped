@@ -6,6 +6,10 @@ import org.example.scheduledeveloped.entity.User;
 /*
 비밀번호를 사용해도 되는 것인가?
  */
+
+/**
+ *
+ */
 @Getter
 public class SessionUserResponseDto {
     private final Long id;

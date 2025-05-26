@@ -3,6 +3,10 @@ package org.example.scheduledeveloped.dto.commentDto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
+
+/**
+ *
+ */
 @Getter
 public class CommentRequestDto {
 

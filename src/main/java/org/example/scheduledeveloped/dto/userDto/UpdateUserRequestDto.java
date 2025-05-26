@@ -2,6 +2,10 @@ package org.example.scheduledeveloped.dto.userDto;
 
 import lombok.Getter;
 
+
+/**
+ *
+ */
 @Getter
 public class UpdateUserRequestDto {
 

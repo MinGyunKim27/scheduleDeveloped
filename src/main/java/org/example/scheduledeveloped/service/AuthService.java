@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+
+/**
+ *
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -20,6 +24,13 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+
+    /**
+     *
+     * @param email
+     * @param password
+     * @return
+     */
     public SessionUserResponseDto login(String email, String password){
         User user = userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("이메일에 해당하는 사용자가 없습니다."));
@@ -30,6 +41,14 @@ public class AuthService {
         return SessionUserResponseDto.toDto(user);
     }
 
+
+    /**
+     *
+     * @param userName
+     * @param email
+     * @param password
+     * @return
+     */
     @Transactional
     public SignUpResponseDto signUp(String userName, String email, String password){
         String encodedPassword = passwordEncoder.encode(password);
