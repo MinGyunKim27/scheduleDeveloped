@@ -32,7 +32,7 @@ public class UserResponseDto {
      * @param username 사용자 이름
      * @param email 사용자 이메일
      */
-    public UserResponseDto(Long id, String username, String email) {
+    public UserResponseDto(Long id, String email, String username) {
         this.id = id;
         this.email = email;
         this.userName = username;

@@ -36,9 +36,18 @@
             width: 80px;
         }
 
+        .btn-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn-row button {
+            flex: 1;
+        }
+
         button {
-            margin-top: 12px;
-            width: 100%;
             padding: 10px;
             font-size: 16px;
             border: none;
@@ -67,6 +76,9 @@
         .back-btn {
             background-color: #ccc;
             color: black;
+            margin-top: 20px;
+            float: right;
+            width: 33%;
         }
 
         .back-btn:hover {
@@ -87,6 +99,28 @@
             border-radius: 8px;
             margin-bottom: 8px;
             background-color: #fafafa;
+            position: relative;
+        }
+
+        .btn-group {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .btn-group button {
+            background-color: #eee;
+            border: none;
+            padding: 2px 6px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-group button:hover {
+            background-color: #ddd;
         }
 
         .comment-form textarea {
@@ -112,18 +146,21 @@
 <body>
 <div class="todo-detail">
     <h1>📝 투두 상세</h1>
-    <div class="field"><strong>ID:</strong> <span id="todo-id"></span></div>
+    <div class="field" style="display: none;"><strong>ID:</strong> <span id="todo-id"></span></div>
     <div class="field"><strong>제목:</strong> <span id="todo-title"></span></div>
     <div class="field"><strong>내용:</strong> <span id="todo-contents"></span></div>
     <div class="field"><strong>작성자:</strong> <span id="todo-user"></span></div>
 
-    <button class="update-btn" onclick="goToEdit()">✏️ 수정하기</button>
+    <div class="btn-row">
+        <button class="update-btn" onclick="goToEdit()">✏️ 수정</button>
+        <button class="delete-btn" onclick="deleteTodo()">🗑 삭제</button>
+    </div>
+
     <button class="back-btn" onclick="goBack()">← 목록으로</button>
 
     <div class="comments-section">
         <h2>💬 댓글</h2>
         <div id="comments"></div>
-
         <div class="comment-form">
             <textarea id="new-comment" placeholder="댓글을 입력하세요" rows="3"></textarea>
             <button onclick="postComment()">댓글 등록</button>
@@ -133,6 +170,22 @@
 
 <script>
     const id = new URLSearchParams(window.location.search).get('id');
+    const page = new URLSearchParams(window.location.search).get('page') || 0;
+    let currentUserName = null;
+
+    fetch('/users/me')
+        .then(res => {
+            if (!res.ok) throw new Error('로그인 필요');
+            return res.json();
+        })
+        .then(user => {
+            currentUserName = user.userName;
+            loadComments();
+        })
+        .catch(() => {
+            currentUserName = null;
+            loadComments();
+        });
 
     fetch(`/api/todos/${id}`)
         .then(res => res.json())
@@ -147,8 +200,22 @@
         window.location.href = `/todo-edit.html?id=${id}`;
     }
 
+    function deleteTodo() {
+        if (!confirm('정말 삭제하시겠습니까?')) return;
+        fetch(`/api/todos/${id}`, {
+            method: 'DELETE'
+        }).then(res => {
+            if (res.ok) {
+                alert('삭제되었습니다.');
+                window.location.href = `/todos.html?page=${page}`;
+            } else {
+                alert('삭제 실패');
+            }
+        });
+    }
+
     function goBack() {
-        window.location.href = '/todos.html';
+        window.location.href = `/todos.html?page=${page}`;
     }
 
     function loadComments() {
@@ -160,7 +227,29 @@
                 comments.forEach(c => {
                     const div = document.createElement('div');
                     div.className = 'comment';
-                    div.textContent = `${c.userName || '익명'}: ${c.contents}`;
+
+                    const textSpan = document.createElement('span');
+                    textSpan.className = 'comment-text';
+                    textSpan.textContent = `${c.userName || '익명'}: ${c.contents}`;
+                    div.appendChild(textSpan);
+
+                    if (currentUserName === c.userName) {
+                        const btnGroup = document.createElement('div');
+                        btnGroup.className = 'btn-group';
+
+                        const editBtn = document.createElement('button');
+                        editBtn.textContent = '✏️';
+                        editBtn.onclick = () => startEditComment(c.id, editBtn);
+
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.textContent = '❌';
+                        deleteBtn.onclick = () => deleteComment(c.id);
+
+                        btnGroup.appendChild(editBtn);
+                        btnGroup.appendChild(deleteBtn);
+                        div.appendChild(btnGroup);
+                    }
+
                     commentList.appendChild(div);
                 });
             });
@@ -174,18 +263,64 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ contents })
-        })
-            .then(res => {
-                if (res.ok) {
-                    document.getElementById('new-comment').value = '';
-                    loadComments();
-                } else {
-                    alert('댓글 등록 실패');
-                }
-            });
+        }).then(res => {
+            if (res.ok) {
+                document.getElementById('new-comment').value = '';
+                loadComments();
+            } else {
+                alert('댓글 등록 실패');
+            }
+        });
     }
 
-    loadComments();
+    function startEditComment(commentId, buttonElement) {
+        const commentDiv = buttonElement.closest('.comment');
+        const currentText = commentDiv.querySelector('.comment-text').textContent.split(': ').slice(1).join(': ').trim();
+
+        const textarea = document.createElement('textarea');
+        textarea.value = currentText;
+        textarea.rows = 3;
+        textarea.style.width = '100%';
+        textarea.style.marginTop = '8px';
+
+        const saveBtn = document.createElement('button');
+        saveBtn.textContent = '💾 저장';
+        saveBtn.style.marginTop = '8px';
+        saveBtn.onclick = function () {
+            const newContent = textarea.value.trim();
+            if (!newContent) return alert('내용을 입력하세요');
+
+            fetch(`/api/todos/${id}/comments/${commentId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: newContent })
+            }).then(res => {
+                if (res.ok) {
+                    loadComments();
+                } else {
+                    alert('수정 실패');
+                }
+            });
+        };
+
+        commentDiv.innerHTML = '';
+        commentDiv.appendChild(textarea);
+        commentDiv.appendChild(saveBtn);
+    }
+
+    function deleteComment(commentId) {
+        if (!confirm('정말 삭제하시겠습니까?')) return;
+
+        fetch(`/api/todos/${id}/comments/${commentId}`, {
+            method: 'DELETE'
+        }).then(res => {
+            if (res.ok) {
+                loadComments();
+            } else {
+                alert('삭제 실패');
+            }
+        });
+    }
 </script>
 </body>
 </html>

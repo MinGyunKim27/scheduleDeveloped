@@ -78,7 +78,11 @@
     <form id="update-form">
         <label>
             새 이름:
-            <input type="text" id="newUserName" required>
+            <input type="text" id="userName" required>
+        </label>
+        <label>
+            현재 비밀번호:
+            <input type="password" id="oldPassword" required>
         </label>
         <label>
             새 비밀번호:
@@ -92,7 +96,8 @@
     document.getElementById('update-form').addEventListener('submit', function(e) {
         e.preventDefault();
 
-        const newUserName = document.getElementById('newUserName').value;
+        const userName = document.getElementById('userName').value;
+        const oldPassword = document.getElementById('oldPassword').value;
         const newPassword = document.getElementById('newPassword').value;
 
         fetch('/users/me')
@@ -102,29 +107,27 @@
             })
             .then(user => {
                 const updateDto = {
-                    id: user.id,
-                    email: user.email,
-                    userName: user.userName,
-                    password: 'dummy' // 실제 구현에 맞게 수정 필요
+                    userName,
+                    oldPassword,
+                    newPassword
                 };
 
-                return fetch(`/users?newUserName=${encodeURIComponent(newUserName)}&newPassword=${encodeURIComponent(newPassword)}`, {
+                return fetch(`/users/${user.id}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(updateDto)
                 });
             })
             .then(res => {
-                if (res.ok) {
-                    alert('정보 수정 완료!');
-                    window.location.href = '/profile.html';
-                } else {
-                    alert('수정 실패');
-                }
+                if (!res.ok) throw new Error('수정 실패');
+                return res.json();
+            })
+            .then(updatedUser => {
+                alert('수정 성공! 새로운 이름: ' + updatedUser.userName);
+                window.location.href = '/profile.html';
             })
             .catch(err => {
-                console.error(err);
-                alert('오류 발생. 다시 시도하세요.');
+                alert(err.message);
             });
     });
 </script>

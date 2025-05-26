@@ -83,6 +83,7 @@ public class CommentService {
      * @throws CommentNotFoundException 댓글이 존재하지 않을 경우
      * @throws AccessDeniedException 사용자가 댓글 작성자가 아닐 경우
      */
+    @Transactional
     public CommentResponseDto updateComments(Long id, CommentRequestDto requestDto, UserResponseDto userResponseDto) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new CommentNotFoundException("해당 Comment를 찾을 수 없습니다."));
@@ -102,6 +103,7 @@ public class CommentService {
      * @throws CommentNotFoundException 댓글이 존재하지 않을 경우
      * @throws AccessDeniedException 사용자가 댓글 작성자가 아닐 경우
      */
+    @Transactional
     public Long deleteComment(Long id, UserResponseDto userResponseDto) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new CommentNotFoundException("해당 Comment를 찾을 수 없습니다."));

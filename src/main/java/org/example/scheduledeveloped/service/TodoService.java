@@ -13,6 +13,8 @@ import org.example.scheduledeveloped.exception.UserNotFoundException;
 import org.example.scheduledeveloped.helper.TodoQueryHelper;
 import org.example.scheduledeveloped.repository.TodoRepository;
 import org.example.scheduledeveloped.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -128,5 +130,12 @@ public class TodoService {
             throw new AccessDeniedException("해당 할 일을 수정할 권한이 없습니다.");
         }
     }
+
+    // TodoService.java
+    public Page<TodoResponseDto> findTodosPaged(Pageable pageable) {
+        return todoRepository.findAll(pageable)
+                .map(TodoResponseDto::toDto); // Page<Todo> → Page<TodoResponseDto>
+    }
+
 }
 

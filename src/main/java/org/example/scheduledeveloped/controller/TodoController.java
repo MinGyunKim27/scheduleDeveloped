@@ -4,10 +4,14 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.example.scheduledeveloped.Common.Const;
 import org.example.scheduledeveloped.dto.todoDto.CreateTodoRequestDto;
+import org.example.scheduledeveloped.dto.todoDto.PagedResponse;
 import org.example.scheduledeveloped.dto.todoDto.TodoResponseDto;
 import org.example.scheduledeveloped.dto.todoDto.UpdateTodoRequestDto;
 import org.example.scheduledeveloped.dto.userDto.UserResponseDto;
 import org.example.scheduledeveloped.service.TodoService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -113,4 +117,21 @@ public class TodoController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    /**
+     * 페이징 처리가 적용된 Todo 목록을 조회합니다.
+     *
+     * @param pageable 페이징 및 정렬 정보를 포함한 객체 (page, size, sort 등)
+     * @return 페이지 형태의 Todo 응답 DTO 목록
+     */
+    @GetMapping("/page")
+    public ResponseEntity<PagedResponse<TodoResponseDto>> findTodosPaged(
+            @PageableDefault(page = 0, size = 10, sort = "createdAt") Pageable pageable) {
+
+        Page<TodoResponseDto> page = todoService.findTodosPaged(pageable);
+        return ResponseEntity.ok(PagedResponse.from(page));
+    }
+
+
+
 }
