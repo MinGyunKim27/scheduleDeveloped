@@ -6,7 +6,7 @@
     `created_at` DATETIME(6),
     `updated_at` DATETIME(6),
     PRIMARY KEY (`id`)
-) 
+);
 
 CREATE TABLE `todo` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -17,7 +17,7 @@ CREATE TABLE `todo` (
     `updated_at` DATETIME(6),
     PRIMARY KEY (`id`),
     CONSTRAINT `FK_todo_user` FOREIGN KEY (`user_id`) REFERENCES `user_dev`(`id`)
-)
+);
 
 CREATE TABLE `comment` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
