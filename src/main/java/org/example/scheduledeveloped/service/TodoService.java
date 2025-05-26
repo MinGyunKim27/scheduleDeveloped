@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.scheduledeveloped.dto.todoDto.CreateTodoRequestDto;
 import org.example.scheduledeveloped.dto.todoDto.TodoResponseDto;
-import org.example.scheduledeveloped.dto.userDto.SessionUserDto;
+import org.example.scheduledeveloped.dto.userDto.UserResponseDto;
 import org.example.scheduledeveloped.entity.Todo;
 import org.example.scheduledeveloped.entity.User;
 import org.example.scheduledeveloped.exception.AccessDeniedException;
@@ -34,13 +34,13 @@ public class TodoService {
      * 새로운 Todo를 생성한다.
      *
      * @param dto 생성할 Todo 정보 (제목, 내용)
-     * @param sessionUserDto 현재 로그인한 사용자 정보
+     * @param userResponseDto 현재 로그인한 사용자 정보
      * @return 생성된 Todo 정보를 담은 응답 DTO
      * @throws UserNotFoundException 세션 사용자 정보를 찾을 수 없을 때 발생
      */
     @Transactional
-    public TodoResponseDto createTodo(CreateTodoRequestDto dto, SessionUserDto sessionUserDto) {
-        Long userId = sessionUserDto.getId();
+    public TodoResponseDto createTodo(CreateTodoRequestDto dto, UserResponseDto userResponseDto) {
+        Long userId = userResponseDto.getId();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("세션 사용자 정보를 찾을 수 없습니다."));
@@ -81,14 +81,14 @@ public class TodoService {
      * @param id 수정할 Todo ID
      * @param title 새로운 제목
      * @param contents 새로운 내용
-     * @param sessionUserDto 현재 로그인한 사용자 정보
+     * @param userResponseDto 현재 로그인한 사용자 정보
      * @return 수정된 Todo의 응답 DTO
      * @throws AccessDeniedException 다른 사용자의 Todo를 수정하려 할 때 발생
      */
     @Transactional
-    public TodoResponseDto updateTodo(Long id, String title, String contents, SessionUserDto sessionUserDto) {
+    public TodoResponseDto updateTodo(Long id, String title, String contents, UserResponseDto userResponseDto) {
         Todo byId = getTodoOrThrow(id);
-        validateTodoOwner(byId, sessionUserDto.getId());
+        validateTodoOwner(byId, userResponseDto.getId());
         byId.updateTodo(title, contents);
         return TodoResponseDto.toDto(byId);
     }
@@ -97,12 +97,12 @@ public class TodoService {
      * Todo를 삭제한다. 삭제는 본인만 가능하다.
      *
      * @param id 삭제할 Todo ID
-     * @param sessionUserDto 현재 로그인한 사용자 정보
+     * @param userResponseDto 현재 로그인한 사용자 정보
      * @throws AccessDeniedException 다른 사용자의 Todo를 삭제하려 할 때 발생
      */
-    public void deleteTodo(Long id, SessionUserDto sessionUserDto) {
+    public void deleteTodo(Long id,  UserResponseDto userResponseDto) {
         Todo byId = getTodoOrThrow(id);
-        validateTodoOwner(byId, sessionUserDto.getId());
+        validateTodoOwner(byId, userResponseDto.getId());
         todoRepository.delete(byId);
     }
 

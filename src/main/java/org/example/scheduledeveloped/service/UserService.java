@@ -3,7 +3,6 @@ package org.example.scheduledeveloped.service;
 import lombok.RequiredArgsConstructor;
 import org.example.scheduledeveloped.config.PasswordEncoder;
 import org.example.scheduledeveloped.dto.authDto.PasswordRequestDto;
-import org.example.scheduledeveloped.dto.userDto.SessionUserDto;
 import org.example.scheduledeveloped.dto.userDto.UpdateUserRequestDto;
 import org.example.scheduledeveloped.dto.userDto.UserResponseDto;
 import org.example.scheduledeveloped.entity.User;
@@ -69,16 +68,16 @@ public class UserService {
      * id 기반으로 조회한 사용자를 수정하는 메서드.
      * @param id 사용자 id
      * @param dto 수정하고자 하는 사용자 정보
-     * @param sessionUserDto 비밀번호를 포함한 사용자 정보
+     * @param userResponseDto 비밀번호를 포함한 사용자 정보
      * @return 업데이트된 사용자 정보
      */
     @Transactional
     public UserResponseDto updateUser(
             Long id,
             UpdateUserRequestDto dto,
-            SessionUserDto sessionUserDto) {
+            UserResponseDto userResponseDto) {
 
-        if (!sessionUserDto.getId().equals(id)){
+        if (!userResponseDto.getId().equals(id)){
             throw new UserNotValid("사용자가 일치하지 않습니다.");
         }
 
@@ -105,11 +104,11 @@ public class UserService {
     public void deleteUser(
             Long id,
             PasswordRequestDto dto,
-            SessionUserDto sessionUserDto
+            UserResponseDto userResponseDto
     ) {
 
 
-        if (!sessionUserDto.getId().equals(id)){
+        if (!userResponseDto.getId().equals(id)){
             throw new UserNotValid("사용자가 일치하지 않습니다.");
         }
 

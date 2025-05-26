@@ -1,17 +1,92 @@
-<!-- src/main/resources/static/profileUpdate.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <title>내 정보 수정</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #fff;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 20px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-<h1>내 정보 수정</h1>
-<form id="update-form">
-    <label>새 이름: <input type="text" id="newUserName" required></label><br>
-    <label>새 비밀번호: <input type="password" id="newPassword" required></label><br>
-    <button type="submit">수정하기</button>
-</form>
+<div class="container">
+    <h1>내 정보 수정</h1>
+    <form id="update-form">
+        <label>
+            새 이름:
+            <input type="text" id="newUserName" required>
+        </label>
+        <label>
+            새 비밀번호:
+            <input type="password" id="newPassword" required>
+        </label>
+        <button type="submit">수정하기</button>
+    </form>
+</div>
 
 <script>
     document.getElementById('update-form').addEventListener('submit', function(e) {
@@ -20,7 +95,6 @@
         const newUserName = document.getElementById('newUserName').value;
         const newPassword = document.getElementById('newPassword').value;
 
-        // 세션에서 현재 사용자 정보 불러오기
         fetch('/users/me')
             .then(res => {
                 if (!res.ok) throw new Error('로그인 필요');
@@ -31,7 +105,7 @@
                     id: user.id,
                     email: user.email,
                     userName: user.userName,
-                    password: 'dummy' // 서버에서 이전 비번은 검증 없이 쓰는 구조라면 더미값
+                    password: 'dummy' // 실제 구현에 맞게 수정 필요
                 };
 
                 return fetch(`/users?newUserName=${encodeURIComponent(newUserName)}&newPassword=${encodeURIComponent(newPassword)}`, {

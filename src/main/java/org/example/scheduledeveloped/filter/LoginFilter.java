@@ -25,7 +25,8 @@ public class LoginFilter implements Filter {
             "/auth/login",
             "/logout",
             "/login.html",
-            "/signup.html"
+            "/signup.html",
+            "/favicon.ico"
     };
 
 
