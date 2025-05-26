@@ -1,8 +1,7 @@
-<!-- src/main/resources/static/todo.html -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>투두 상세</title>
     <style>
         body {
@@ -10,8 +9,9 @@
             background-color: #f0f2f5;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
+            align-items: flex-start;
+            padding-top: 60px;
+            min-height: 100vh;
         }
 
         .todo-detail {
@@ -19,7 +19,7 @@
             padding: 40px;
             border-radius: 16px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            width: 500px;
         }
 
         h1 {
@@ -34,15 +34,6 @@
         .field strong {
             display: inline-block;
             width: 80px;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 4px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 14px;
         }
 
         button {
@@ -81,105 +72,120 @@
         .back-btn:hover {
             background-color: #bbb;
         }
+
+        .comments-section {
+            margin-top: 40px;
+        }
+
+        .comments-section h2 {
+            margin-bottom: 10px;
+        }
+
+        .comment {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background-color: #fafafa;
+        }
+
+        .comment-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: none;
+        }
+
+        .comment-form button {
+            margin-top: 8px;
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .comment-form button:hover {
+            background-color: #1976d2;
+        }
     </style>
 </head>
 <body>
 <div class="todo-detail">
     <h1>📝 투두 상세</h1>
+    <div class="field"><strong>ID:</strong> <span id="todo-id"></span></div>
+    <div class="field"><strong>제목:</strong> <span id="todo-title"></span></div>
+    <div class="field"><strong>내용:</strong> <span id="todo-contents"></span></div>
+    <div class="field"><strong>작성자:</strong> <span id="todo-user"></span></div>
 
-    <form id="update-form">
-        <div class="field">
-            <strong>ID:</strong> <span id="todo-id"></span>
-        </div>
-        <div class="field">
-            <label><strong>제목:</strong>
-                <input type="text" id="todo-title" required>
-            </label>
-        </div>
-        <div class="field">
-            <label><strong>내용:</strong>
-                <textarea id="todo-contents" rows="4" required></textarea>
-            </label>
-        </div>
-        <div class="field">
-            <strong>작성자:</strong> <span id="todo-user"></span>
-        </div>
+    <button class="update-btn" onclick="goToEdit()">✏️ 수정하기</button>
+    <button class="back-btn" onclick="goBack()">← 목록으로</button>
 
-        <button type="submit" class="update-btn">수정하기</button>
-        <button type="button" class="delete-btn" onclick="deleteTodo()">삭제하기</button>
-        <button type="button" class="back-btn" onclick="goBack()">← 목록으로</button>
-    </form>
+    <div class="comments-section">
+        <h2>💬 댓글</h2>
+        <div id="comments"></div>
+
+        <div class="comment-form">
+            <textarea id="new-comment" placeholder="댓글을 입력하세요" rows="3"></textarea>
+            <button onclick="postComment()">댓글 등록</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id');
+    const id = new URLSearchParams(window.location.search).get('id');
 
-    if (!id) {
-        alert('유효하지 않은 접근입니다.');
-        window.location.href = '/todos.html';
-    }
-
-    // 상세 조회
     fetch(`/api/todos/${id}`)
-        .then(res => {
-            if (!res.ok) throw new Error('조회 실패');
-            return res.json();
-        })
+        .then(res => res.json())
         .then(todo => {
             document.getElementById('todo-id').textContent = todo.id;
-            document.getElementById('todo-title').value = todo.title;
-            document.getElementById('todo-contents').value = todo.contents;
+            document.getElementById('todo-title').textContent = todo.title;
+            document.getElementById('todo-contents').textContent = todo.contents;
             document.getElementById('todo-user').textContent = todo.userName || '알 수 없음';
-        })
-        .catch(err => {
-            console.error(err);
-            alert('투두를 불러오지 못했습니다.');
-            window.location.href = '/todos.html';
         });
 
-    // 수정 요청
-    document.getElementById('update-form').addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const title = document.getElementById('todo-title').value;
-        const contents = document.getElementById('todo-contents').value;
-
-        fetch(`/api/todos/${id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, contents })
-        })
-            .then(res => {
-                if (res.ok) {
-                    alert('수정 완료!');
-                    location.reload();
-                } else {
-                    alert('수정 실패');
-                }
-            });
-    });
-
-    // 삭제 요청
-    function deleteTodo() {
-        if (!confirm('정말로 삭제하시겠습니까?')) return;
-
-        fetch(`/api/todos/${id}`, {
-            method: 'DELETE'
-        })
-            .then(res => {
-                if (res.ok) {
-                    alert('삭제 완료!');
-                    window.location.href = '/todos.html';
-                } else {
-                    alert('삭제 실패');
-                }
-            });
+    function goToEdit() {
+        window.location.href = `/todo-edit.html?id=${id}`;
     }
 
     function goBack() {
         window.location.href = '/todos.html';
     }
+
+    function loadComments() {
+        fetch(`/api/todos/${id}/comments`)
+            .then(res => res.json())
+            .then(comments => {
+                const commentList = document.getElementById('comments');
+                commentList.innerHTML = '';
+                comments.forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = 'comment';
+                    div.textContent = `${c.userName || '익명'}: ${c.contents}`;
+                    commentList.appendChild(div);
+                });
+            });
+    }
+
+    function postComment() {
+        const contents = document.getElementById('new-comment').value.trim();
+        if (!contents) return;
+
+        fetch(`/api/todos/${id}/comments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents })
+        })
+            .then(res => {
+                if (res.ok) {
+                    document.getElementById('new-comment').value = '';
+                    loadComments();
+                } else {
+                    alert('댓글 등록 실패');
+                }
+            });
+    }
+
+    loadComments();
 </script>
 </body>
 </html>

@@ -1,12 +1,17 @@
 package org.example.scheduledeveloped.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.scheduledeveloped.dto.SignUpResponseDto;
-import org.example.scheduledeveloped.dto.UpdateUserRequestDto;
-import org.example.scheduledeveloped.dto.UserResponseDto;
+import org.example.scheduledeveloped.config.PasswordEncoder;
+import org.example.scheduledeveloped.dto.authDto.PasswordRequestDto;
+import org.example.scheduledeveloped.dto.userDto.SessionUserResponseDto;
+import org.example.scheduledeveloped.dto.userDto.UpdateUserRequestDto;
+import org.example.scheduledeveloped.dto.userDto.UserResponseDto;
 import org.example.scheduledeveloped.entity.User;
+import org.example.scheduledeveloped.exception.PasswordMismatchException;
+import org.example.scheduledeveloped.exception.UserNotFoundException;
 import org.example.scheduledeveloped.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,17 +19,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-
-    public SignUpResponseDto save(String userName, String email, String password){
-        User user = new User(userName,email,password);
-
-        User saved = userRepository.save(user);
-
-        return new SignUpResponseDto(saved.getId(),saved.getUserName(),saved.getEmail());
-    }
+    private final PasswordEncoder passwordEncoder;
 
     public UserResponseDto findUserByUserName(String userName){
-        User user = userRepository.findMemberByUserNameOrElseThrow(userName);
+        User user = userRepository.findUserByUserName(userName).orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다!"));;
 
 
         return new UserResponseDto(user.getId(),user.getEmail(),user.getUserName());
@@ -32,9 +30,15 @@ public class UserService {
 
 
     public UserResponseDto findUserById(Long id) {
-        User user = userRepository.findByIdOrElseThrow(id);
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다!"));;
 
         return new UserResponseDto(user.getId(),user.getEmail(),user.getUserName());
+    }
+
+    public SessionUserResponseDto findUserByIdContainsPassword(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다!"));;
+
+        return new SessionUserResponseDto(user.getId(),user.getEmail(),user.getUserName(), user.getPassword());
     }
 
     public List<UserResponseDto> findAllUsers(){
@@ -45,23 +49,35 @@ public class UserService {
                 .toList();
     }
 
-    public UserResponseDto updateUser(UpdateUserRequestDto requestDto, String newUserName,String newPassword) {
-        User foundedUser = userRepository.findUserByUserNameAndPasswordOrElseThrow(requestDto.getUserName(), requestDto.getPassword());
+    @Transactional
+    public SessionUserResponseDto updateUser(
+            Long id,
+            UpdateUserRequestDto dto,
+            SessionUserResponseDto sessionUserResponseDto) {
 
-        foundedUser.updateUserNameAndPassword(newUserName,newPassword);
+        if (!passwordEncoder.matches(dto.getOldPassword(),sessionUserResponseDto.getPassword())){
+            throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
+        }
 
-        return UserResponseDto.toDto(foundedUser);
+        User foundedUser = userRepository.findUserById(id).orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다!"));
+        String encodedNewPassword = passwordEncoder.encode(dto.getNewPassword());
+        foundedUser.updateUserNameAndPassword(dto.getUserName(), encodedNewPassword);
+
+        return SessionUserResponseDto.toDto(foundedUser);
     }
 
+    @Transactional
+    public void deleteUser(
+            Long id,
+            PasswordRequestDto dto,
+            SessionUserResponseDto sessionUserResponseDto
+    ) {
 
-    public void deleteUser(Long id) {
-        User byId = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User가 존재하지 않습니다."));
+        if (!passwordEncoder.matches(dto.getPassword(),sessionUserResponseDto.getPassword())){
+            throw new PasswordMismatchException("비밀번호가 일치하지 않습니다.");
+        }
+
+        User byId = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다!"));
         userRepository.delete(byId);
-    }
-
-    public UserResponseDto login(String email, String password){
-        User loginUser = userRepository.findUserByUserEmailAndPasswordOrElseThrow(email,password);
-
-        return UserResponseDto.toDto(loginUser);
     }
 }

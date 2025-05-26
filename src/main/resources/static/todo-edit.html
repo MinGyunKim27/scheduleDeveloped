@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>✏️ 투두 수정</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .edit-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="edit-container">
+    <h1>✏️ 투두 수정</h1>
+    <form id="edit-form">
+        <input type="text" id="edit-title" placeholder="제목" required />
+        <textarea id="edit-contents" placeholder="내용" rows="4" required></textarea>
+        <button type="submit">저장</button>
+    </form>
+</div>
+
+<script>
+    const id = new URLSearchParams(window.location.search).get('id');
+
+    fetch(`/api/todos/${id}`)
+        .then(res => res.json())
+        .then(todo => {
+            document.getElementById('edit-title').value = todo.title;
+            document.getElementById('edit-contents').value = todo.contents;
+        });
+
+    document.getElementById('edit-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const title = document.getElementById('edit-title').value;
+        const contents = document.getElementById('edit-contents').value;
+
+        fetch(`/api/todos/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, contents })
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert('수정 완료!');
+                    window.location.href = `/todo.html?id=${id}`;
+                } else {
+                    alert('수정 실패!');
+                }
+            });
+    });
+</script>
+</body>
+</html>

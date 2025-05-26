@@ -1,4 +1,4 @@
-package org.example.scheduledeveloped.dto;
+package org.example.scheduledeveloped.dto.userDto;
 
 import lombok.Getter;
 import org.example.scheduledeveloped.entity.User;
@@ -18,6 +18,6 @@ public class UserResponseDto {
     }
 
     public static UserResponseDto toDto(User user){
-        return new UserResponseDto(user.getId(), user.getEmail(), user.getUserName());
+        return new UserResponseDto(user.getId(),  user.getUserName(), user.getEmail());
     }
 }

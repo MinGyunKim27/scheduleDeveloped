@@ -4,13 +4,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.example.scheduledeveloped.Common.Const;
-import org.example.scheduledeveloped.dto.LoginRequestDto;
-import org.example.scheduledeveloped.dto.SignUpRequestDto;
-import org.example.scheduledeveloped.dto.SignUpResponseDto;
-import org.example.scheduledeveloped.dto.UserResponseDto;
+import org.example.scheduledeveloped.dto.authDto.LoginRequestDto;
+import org.example.scheduledeveloped.dto.authDto.SignUpRequestDto;
+import org.example.scheduledeveloped.dto.authDto.SignUpResponseDto;
+import org.example.scheduledeveloped.dto.userDto.SessionUserResponseDto;
+import org.example.scheduledeveloped.service.AuthService;
 import org.example.scheduledeveloped.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -19,21 +21,22 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
     private final UserService userService;
+    private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<SignUpResponseDto> signUp( @RequestBody SignUpRequestDto requestDto ){
-        SignUpResponseDto signUpResponseDto = userService.save(requestDto.getUserName(), requestDto.getEmail(), requestDto.getPassword());
+    public ResponseEntity<SignUpResponseDto> signUp(@Validated @RequestBody SignUpRequestDto requestDto ){
+        SignUpResponseDto signUpResponseDto = authService.signUp(requestDto.getUserName(), requestDto.getEmail(), requestDto.getPassword());
 
         return new ResponseEntity<>(signUpResponseDto, HttpStatus.OK);
     }
 
     @PostMapping("/login")
     public String login(
-            @RequestBody LoginRequestDto requestDto,
+            @Validated @RequestBody LoginRequestDto requestDto,
             HttpServletRequest servletRequest
     ){
 
-        UserResponseDto responseDto = userService.login(requestDto.getEmail(), requestDto.getPassword());
+        SessionUserResponseDto responseDto = authService.login(requestDto.getEmail(), requestDto.getPassword());
         Long id = responseDto.getId();
 
         if (id == null){
@@ -42,7 +45,7 @@ public class AuthController {
 
         HttpSession session = servletRequest.getSession();
 
-        UserResponseDto loginUser = userService.findUserById(id);
+        SessionUserResponseDto loginUser = userService.findUserByIdContainsPassword(id);
 
         session.setAttribute(Const.LOGIN_USER,loginUser);
 

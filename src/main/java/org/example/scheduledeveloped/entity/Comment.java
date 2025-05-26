@@ -2,41 +2,36 @@ package org.example.scheduledeveloped.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
 
-@Getter
 @Entity
-@Table(name = "Todo")
-public class Todo extends BaseEntity{
+@Getter
+@Table(name = "comment")
+public class Comment extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false,columnDefinition = "longtext")
     private String contents;
 
+    @ManyToOne
+    @JoinColumn(name = "todo_id", nullable = false)
+    private Todo todo;
 
-    @Setter
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-
-    public Todo(String title, String contents, User user) {
-        this.title = title;
+    public Comment(String contents, Todo todo, User user) {
         this.contents = contents;
+        this.todo = todo;
         this.user = user;
     }
 
-    public Todo() {
-
+    public Comment() {
     }
 
-    public void updateTodo(String title, String contents){
-        this.title = title;
+    public void updateComment(String contents){
         this.contents = contents;
     }
 }

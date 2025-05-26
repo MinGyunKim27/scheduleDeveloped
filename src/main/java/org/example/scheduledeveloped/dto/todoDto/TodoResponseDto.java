@@ -1,4 +1,4 @@
-package org.example.scheduledeveloped.dto;
+package org.example.scheduledeveloped.dto.todoDto;
 
 import lombok.Getter;
 import org.example.scheduledeveloped.entity.Todo;

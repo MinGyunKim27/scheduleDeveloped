@@ -10,11 +10,11 @@ import java.util.Optional;
 
 public interface TodoRepository extends JpaRepository<Todo,Long> {
 
-    List<Todo> findByTitle(String title);
+    List<Todo> findByTitleContaining(String title);
 
     List<Todo> findByContentsContaining(String contents);
 
-    List<Todo> findByContentsContainingAndTitle(String contents, String title);
+    List<Todo> findByContentsContainingAndTitleContaining(String contents, String title);
 
     Optional<Todo> findTodoById(Long id);
 

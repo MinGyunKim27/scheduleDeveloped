@@ -3,9 +3,14 @@ package org.example.scheduledeveloped.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.scheduledeveloped.dto.TodoResponseDto;
+import org.example.scheduledeveloped.dto.todoDto.CreateTodoRequestDto;
+import org.example.scheduledeveloped.dto.userDto.SessionUserResponseDto;
+import org.example.scheduledeveloped.dto.todoDto.TodoResponseDto;
 import org.example.scheduledeveloped.entity.Todo;
 import org.example.scheduledeveloped.entity.User;
+import org.example.scheduledeveloped.exception.AccessDeniedException;
+import org.example.scheduledeveloped.exception.UserNotFoundException;
+import org.example.scheduledeveloped.helper.TodoQueryHelper;
 import org.example.scheduledeveloped.repository.TodoRepository;
 import org.example.scheduledeveloped.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -22,50 +27,54 @@ public class TodoService {
 
 
     @Transactional
-    public TodoResponseDto save(String title, String contents, String userName){
+    public TodoResponseDto createTodo(CreateTodoRequestDto dto, SessionUserResponseDto sessionUserDto) {
+        ;
+        Long userId = sessionUserDto.getId();
 
-        log.info("조회 시도 userName: {}", userName);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("세션 사용자 정보를 찾을 수 없습니다."));
 
-        User user = userRepository.findMemberByUserNameOrElseThrow(userName);
-
-        Todo todo = new Todo(title,contents,user);
-
+        Todo todo = new Todo(dto.getTitle(), dto.getContents(), user);
         todoRepository.save(todo);
 
-        return new TodoResponseDto(todo.getId(),todo.getTitle(),todo.getContents(),userName);
+        return TodoResponseDto.toDto(todo);
     }
 
-
     public List<TodoResponseDto> findTodosByOptionalConditions(String title, String contents) {
-        List<Todo> todos;
-
-        if (title != null && !title.isBlank() && contents != null && !contents.isBlank()) {
-            todos = todoRepository.findByContentsContainingAndTitle(contents, title);
-        } else if (title != null && !title.isBlank()) {
-            todos = todoRepository.findByTitle(title);
-        } else if (contents != null && !contents.isBlank()) {
-            todos = todoRepository.findByContentsContaining(contents);
-        } else {
-            todos = todoRepository.findAll();
-        }
-
+        List<Todo> todos = TodoQueryHelper.filterTodos(title, contents, todoRepository);
         return todos.stream().map(TodoResponseDto::toDto).toList();
     }
 
     public TodoResponseDto findTodoById(Long id) {
-
-        Todo byId = todoRepository.findTodoByIdOrElseThrow(id);
+        Todo byId = getTodoOrThrow(id);
         return TodoResponseDto.toDto(byId);
     }
 
-    public TodoResponseDto updateTodo(Long id, String title, String contents) {
-        Todo byId = todoRepository.findTodoByIdOrElseThrow(id);
+    @Transactional
+    public TodoResponseDto updateTodo(Long id, String title, String contents, SessionUserResponseDto sessionUserDto){
+        Todo byId = getTodoOrThrow(id);
+        validateTodoOwner(byId,sessionUserDto.getId());
         byId.updateTodo(title,contents);
         return TodoResponseDto.toDto(byId);
     }
 
-    public void deleteTodo(Long id) {
-        Todo byId = todoRepository.findTodoByIdOrElseThrow(id);
+    public void deleteTodo(Long id, SessionUserResponseDto sessionUserDto) {
+
+        Todo byId = getTodoOrThrow(id);
+        validateTodoOwner(byId,sessionUserDto.getId());
         todoRepository.delete(byId);
     }
+
+    private Todo getTodoOrThrow(Long id) {
+        return todoRepository.findTodoByIdOrElseThrow(id);
+    }
+
+    private void validateTodoOwner(Todo todo, Long userId) throws AccessDeniedException {
+        if (!todo.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("해당 할 일을 수정할 권한이 없습니다.");
+        }
+    }
+
+
+
 }

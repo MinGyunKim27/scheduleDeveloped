@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>투두 목록</title>
     <style>
         * {
@@ -13,9 +13,8 @@
             margin: 0;
             font-family: 'Arial', sans-serif;
             background-color: #f0f2f5;
-            padding: 100px 40px 40px 40px; /* 상단 100px으로 여유 확보 */
+            padding: 100px 40px 40px 40px;
         }
-
 
         .container {
             display: flex;
@@ -45,13 +44,19 @@
             margin-top: 0;
         }
 
-        input {
+        input, textarea {
             width: 100%;
             padding: 10px;
             margin-bottom: 12px;
             border: 1px solid #ccc;
             border-radius: 8px;
             font-size: 14px;
+        }
+
+        textarea {
+            resize: none;
+            line-height: 1.5;
+            height: 100px;
         }
 
         button {
@@ -99,18 +104,6 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
 
-        textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 14px;
-            resize: none; /* 사용자가 크기 조절 못하게 */
-            line-height: 1.5;
-            height: 100px; /* 추가로 height 직접 설정도 가능 */
-        }
-
         .user-icon, .search-icon {
             position: fixed;
             width: 40px;
@@ -141,90 +134,49 @@
 
         .search-icon {
             top: 20px;
-            right: 70px; /* 사용자 아이콘보다 왼쪽으로 이동 */
+            right: 70px;
         }
-
-
-
-
     </style>
 </head>
-<!-- 상단 생략: 기존 코드 유지 -->
 <body>
-<!-- 상단 현수막/타이틀 -->
-<div class="top-banner">
-    일정관리!
-</div>
+<div class="top-banner">일정관리!</div>
 
-<!-- 🔽 사용자 아이콘 -->
 <div class="user-icon" onclick="goToProfile()" title="내 프로필">
     <svg xmlns="http://www.w3.org/2000/svg" fill="#555" viewBox="0 0 24 24" width="24" height="24">
         <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
     </svg>
 </div>
 
-<!-- 🔽 검색 아이콘 -->
 <div class="search-icon" onclick="goToSearch()" title="검색">
     <svg xmlns="http://www.w3.org/2000/svg" fill="#555" viewBox="0 0 24 24" width="24" height="24">
         <path d="M10 2a8 8 0 0 1 6.32 12.906l4.387 4.387-1.414 1.414-4.387-4.387A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/>
     </svg>
 </div>
 
-
 <div class="container">
-    <!-- 작성 폼 -->
     <div class="form-container">
         <h2>새 투두 작성</h2>
-        <!-- 기존 input → textarea로 교체 -->
         <form id="todo-form">
-            <input type="text" id="title" placeholder="제목" required>
-
-            <!-- ✅ 내용 입력을 textarea로 변경 -->
+            <input type="text" id="title" placeholder="제목" required />
             <textarea id="contents" placeholder="내용" rows="4" required></textarea>
-
-            <input type="text" id="userName" placeholder="작성자" required>
             <button type="submit">추가</button>
         </form>
-
     </div>
 
-    <!-- 투두 리스트 -->
     <div class="list-container">
         <h2>📋 투두 목록</h2>
         <div id="todo-list"></div>
     </div>
+
 </div>
-
-<style>
-    .user-icon {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        width: 40px;
-        height: 40px;
-        background-color: #fff;
-        border-radius: 50%;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        z-index: 1000;
-    }
-
-    .user-icon:hover {
-        background-color: #e6f7e6;
-    }
-
-    .user-icon svg {
-        pointer-events: none;
-    }
-</style>
 
 <script>
     function goToProfile() {
         window.location.href = '/profile.html';
+    }
+
+    function goToSearch() {
+        window.location.href = '/search.html';
     }
 
     function fetchTodos() {
@@ -247,27 +199,39 @@
 
     document.getElementById('todo-form').addEventListener('submit', function (e) {
         e.preventDefault();
+
         const title = document.getElementById('title').value;
         const contents = document.getElementById('contents').value;
-        const userName = document.getElementById('userName').value;
 
         fetch('/api/todos', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ title, contents, userName })
-        }).then(res => {
-            if (res.ok) {
-                alert('추가 성공!');
-                document.getElementById('todo-form').reset();
-                fetchTodos();
-            } else {
-                alert('추가 실패');
-            }
-        });
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, contents })
+        })
+            .then(async res => {
+                if (res.ok) {
+                    alert('추가 성공!');
+                    document.getElementById('todo-form').reset();
+                    fetchTodos();
+                } else {
+                    const error = await res.json();
+                    showError(error);
+                }
+            })
+            .catch(err => {
+                console.error('네트워크 오류:', err);
+                alert('서버와의 통신에 실패했습니다.');
+            });
     });
 
-    function goToSearch() {
-        window.location.href = '/search.html';
+    function showError(error) {
+        let message = `[${error.status}] ${error.message}`;
+        if (error.errors) {
+            for (const [field, msg] of Object.entries(error.errors)) {
+                message += `\n- ${field}: ${msg}`;
+            }
+        }
+        alert(message);
     }
 
     fetchTodos();
