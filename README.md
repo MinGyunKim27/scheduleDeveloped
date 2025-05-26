@@ -102,7 +102,7 @@ java -jar build/libs/scheduledeveloped-0.0.1-SNAPSHOT.jar
 ## 📚 API 문서
 
 API 테스트 및 상세 명세는 아래 Postman 링크에서 확인하실 수 있습니다:  
-🔗 [API 명세 바로가기]([https://documenter.getpostman.com/view/xxxxxx](https://documenter.getpostman.com/view/27028554/2sB2qZEhrs))
+🔗 [API 명세 바로가기](https://documenter.getpostman.com/view/27028554/2sB2qZEhrs)
 
 ---
 
