@@ -7,7 +7,7 @@ import org.example.scheduledeveloped.Common.Const;
 import org.example.scheduledeveloped.dto.authDto.LoginRequestDto;
 import org.example.scheduledeveloped.dto.authDto.SignUpRequestDto;
 import org.example.scheduledeveloped.dto.authDto.SignUpResponseDto;
-import org.example.scheduledeveloped.dto.userDto.SessionUserResponseDto;
+import org.example.scheduledeveloped.dto.userDto.UserResponseDto;
 import org.example.scheduledeveloped.service.AuthService;
 import org.example.scheduledeveloped.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -51,7 +51,7 @@ public class AuthController {
             HttpServletRequest servletRequest
     ){
 
-        SessionUserResponseDto responseDto = authService.login(requestDto.getEmail(), requestDto.getPassword());
+        UserResponseDto responseDto = authService.login(requestDto.getEmail(), requestDto.getPassword());
         Long id = responseDto.getId();
 
         if (id == null){
@@ -60,7 +60,7 @@ public class AuthController {
 
         HttpSession session = servletRequest.getSession();
 
-        SessionUserResponseDto loginUser = userService.findUserByIdContainsPassword(id);
+        UserResponseDto loginUser = userService.findUserById(id);
 
         session.setAttribute(Const.LOGIN_USER,loginUser);
 

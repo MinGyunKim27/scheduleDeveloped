@@ -4,8 +4,8 @@ package org.example.scheduledeveloped.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.scheduledeveloped.dto.todoDto.CreateTodoRequestDto;
-import org.example.scheduledeveloped.dto.userDto.SessionUserResponseDto;
 import org.example.scheduledeveloped.dto.todoDto.TodoResponseDto;
+import org.example.scheduledeveloped.dto.userDto.SessionUserDto;
 import org.example.scheduledeveloped.entity.Todo;
 import org.example.scheduledeveloped.entity.User;
 import org.example.scheduledeveloped.exception.AccessDeniedException;
@@ -26,19 +26,20 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TodoService {
+
     private final TodoRepository todoRepository;
     private final UserRepository userRepository;
 
-
     /**
-     *Todo 를 생성하는 메서드.
-     * @param dto Todo 생성을 위한 정보
-     * @param sessionUserDto 세션의 사용자 정보
-     * @return Todo 응답 정보
+     * 새로운 Todo를 생성한다.
+     *
+     * @param dto 생성할 Todo 정보 (제목, 내용)
+     * @param sessionUserDto 현재 로그인한 사용자 정보
+     * @return 생성된 Todo 정보를 담은 응답 DTO
+     * @throws UserNotFoundException 세션 사용자 정보를 찾을 수 없을 때 발생
      */
     @Transactional
-    public TodoResponseDto createTodo(CreateTodoRequestDto dto, SessionUserResponseDto sessionUserDto) {
-        ;
+    public TodoResponseDto createTodo(CreateTodoRequestDto dto, SessionUserDto sessionUserDto) {
         Long userId = sessionUserDto.getId();
 
         User user = userRepository.findById(userId)
@@ -50,81 +51,82 @@ public class TodoService {
         return TodoResponseDto.toDto(todo);
     }
 
-
     /**
+     * 제목 또는 내용 조건에 따라 Todo 리스트를 조회한다.
+     * 조건이 없으면 전체 Todo를 조회한다.
      *
-     * @param title
-     * @param contents
-     * @return
+     * @param title 제목 검색 조건 (nullable)
+     * @param contents 내용 검색 조건 (nullable)
+     * @return 조건에 맞는 Todo 목록의 응답 DTO 리스트
      */
     public List<TodoResponseDto> findTodosByOptionalConditions(String title, String contents) {
         List<Todo> todos = TodoQueryHelper.filterTodos(title, contents, todoRepository);
         return todos.stream().map(TodoResponseDto::toDto).toList();
     }
 
-
     /**
+     * 특정 ID에 해당하는 Todo를 조회한다.
      *
-     * @param id
-     * @return
+     * @param id 조회할 Todo ID
+     * @return 해당 Todo의 응답 DTO
      */
     public TodoResponseDto findTodoById(Long id) {
         Todo byId = getTodoOrThrow(id);
         return TodoResponseDto.toDto(byId);
     }
 
-
     /**
+     * Todo를 수정한다. 수정은 본인만 가능하다.
      *
-     * @param id
-     * @param title
-     * @param contents
-     * @param sessionUserDto
-     * @return
+     * @param id 수정할 Todo ID
+     * @param title 새로운 제목
+     * @param contents 새로운 내용
+     * @param sessionUserDto 현재 로그인한 사용자 정보
+     * @return 수정된 Todo의 응답 DTO
+     * @throws AccessDeniedException 다른 사용자의 Todo를 수정하려 할 때 발생
      */
     @Transactional
-    public TodoResponseDto updateTodo(Long id, String title, String contents, SessionUserResponseDto sessionUserDto){
+    public TodoResponseDto updateTodo(Long id, String title, String contents, SessionUserDto sessionUserDto) {
         Todo byId = getTodoOrThrow(id);
-        validateTodoOwner(byId,sessionUserDto.getId());
-        byId.updateTodo(title,contents);
+        validateTodoOwner(byId, sessionUserDto.getId());
+        byId.updateTodo(title, contents);
         return TodoResponseDto.toDto(byId);
     }
 
-
     /**
+     * Todo를 삭제한다. 삭제는 본인만 가능하다.
      *
-     * @param id
-     * @param sessionUserDto
+     * @param id 삭제할 Todo ID
+     * @param sessionUserDto 현재 로그인한 사용자 정보
+     * @throws AccessDeniedException 다른 사용자의 Todo를 삭제하려 할 때 발생
      */
-    public void deleteTodo(Long id, SessionUserResponseDto sessionUserDto) {
-
+    public void deleteTodo(Long id, SessionUserDto sessionUserDto) {
         Todo byId = getTodoOrThrow(id);
-        validateTodoOwner(byId,sessionUserDto.getId());
+        validateTodoOwner(byId, sessionUserDto.getId());
         todoRepository.delete(byId);
     }
 
-
     /**
+     * ID로 Todo를 조회하고, 존재하지 않으면 예외를 던진다.
      *
-     * @param id
-     * @return
+     * @param id 조회할 Todo ID
+     * @return 조회된 Todo 엔티티
      */
     private Todo getTodoOrThrow(Long id) {
         return todoRepository.findTodoByIdOrElseThrow(id);
     }
 
     /**
+     * Todo의 작성자가 현재 사용자와 일치하는지 검증한다.
      *
-     * @param todo
-     * @param userId
-     * @throws AccessDeniedException
+     * @param todo 검증 대상 Todo
+     * @param userId 현재 사용자 ID
+     * @throws AccessDeniedException 사용자 권한이 없을 경우 발생
      */
     private void validateTodoOwner(Todo todo, Long userId) throws AccessDeniedException {
         if (!todo.getUser().getId().equals(userId)) {
             throw new AccessDeniedException("해당 할 일을 수정할 권한이 없습니다.");
         }
     }
-
-
-
 }
+

@@ -4,9 +4,9 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.example.scheduledeveloped.Common.Const;
 import org.example.scheduledeveloped.dto.todoDto.CreateTodoRequestDto;
-import org.example.scheduledeveloped.dto.userDto.SessionUserResponseDto;
 import org.example.scheduledeveloped.dto.todoDto.TodoResponseDto;
 import org.example.scheduledeveloped.dto.todoDto.UpdateTodoRequestDto;
+import org.example.scheduledeveloped.dto.userDto.SessionUserDto;
 import org.example.scheduledeveloped.service.TodoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +36,7 @@ public class TodoController {
     public ResponseEntity<TodoResponseDto> postTodo(
             @Validated @RequestBody CreateTodoRequestDto requestDto,
             HttpSession session){
-        SessionUserResponseDto dto = (SessionUserResponseDto) session.getAttribute(Const.LOGIN_USER);
+        SessionUserDto dto = (SessionUserDto) session.getAttribute(Const.LOGIN_USER);
         TodoResponseDto responseDto =
                 todoService.createTodo(
                         requestDto,
@@ -90,7 +90,7 @@ public class TodoController {
             @Validated @PathVariable Long id,
             @Validated @RequestBody UpdateTodoRequestDto requestDto,
             HttpSession session){
-        SessionUserResponseDto dto = (SessionUserResponseDto) session.getAttribute(Const.LOGIN_USER);
+        SessionUserDto dto = (SessionUserDto) session.getAttribute(Const.LOGIN_USER);
         TodoResponseDto todoResponseDto = todoService.updateTodo(id,requestDto.getTitle(),requestDto.getContents(),dto);
 
         return new ResponseEntity<>(todoResponseDto,HttpStatus.OK);
@@ -108,7 +108,7 @@ public class TodoController {
             @Validated @PathVariable Long id,
             HttpSession session
     ){
-        SessionUserResponseDto dto = (SessionUserResponseDto) session.getAttribute(Const.LOGIN_USER);
+        SessionUserDto dto = (SessionUserDto) session.getAttribute(Const.LOGIN_USER);
         todoService.deleteTodo(id,dto);
 
         return new ResponseEntity<>(HttpStatus.OK);

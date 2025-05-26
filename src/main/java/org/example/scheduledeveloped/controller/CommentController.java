@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.scheduledeveloped.Common.Const;
 import org.example.scheduledeveloped.dto.commentDto.CommentRequestDto;
 import org.example.scheduledeveloped.dto.commentDto.CommentResponseDto;
-import org.example.scheduledeveloped.dto.userDto.SessionUserResponseDto;
+import org.example.scheduledeveloped.dto.userDto.SessionUserDto;
 import org.example.scheduledeveloped.service.CommentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,8 +39,8 @@ public class CommentController {
             HttpSession session
             ){
 
-        SessionUserResponseDto sessionUserResponseDto = (SessionUserResponseDto) session.getAttribute(Const.LOGIN_USER);
-        CommentResponseDto response = commentService.createComment(todoId, dto, sessionUserResponseDto);
+        SessionUserDto sessionUserDto = (SessionUserDto) session.getAttribute(Const.LOGIN_USER);
+        CommentResponseDto response = commentService.createComment(todoId, dto, sessionUserDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -73,8 +73,8 @@ public class CommentController {
             @RequestBody CommentRequestDto requestDto,
             HttpSession session
     ){
-        SessionUserResponseDto sessionUserResponseDto = (SessionUserResponseDto) session.getAttribute(Const.LOGIN_USER);
-        CommentResponseDto responseDto = commentService.updateComments(id,requestDto,sessionUserResponseDto);
+        SessionUserDto sessionUserDto = (SessionUserDto) session.getAttribute(Const.LOGIN_USER);
+        CommentResponseDto responseDto = commentService.updateComments(id,requestDto,sessionUserDto);
 
         return ResponseEntity.ok(responseDto);
     }
@@ -91,8 +91,8 @@ public class CommentController {
             @PathVariable Long id,
             HttpSession session
     ){
-        SessionUserResponseDto sessionUserResponseDto = (SessionUserResponseDto) session.getAttribute(Const.LOGIN_USER);
-        Long d = commentService.deleteComment(id,sessionUserResponseDto);
+        SessionUserDto sessionUserDto = (SessionUserDto) session.getAttribute(Const.LOGIN_USER);
+        Long d = commentService.deleteComment(id,sessionUserDto);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
